@@ -19,6 +19,7 @@ Node* generateRandomNode(int numLanes, double laneWidth) {
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<double> laneDist(0, numLanes - 1);
+    // std::uniform_int_distribution<int> laneDist(0, numLanes - 1);
     std::uniform_real_distribution<double> widthDist(0, laneWidth);
     int lane = static_cast<int>(laneDist(gen));
     double x = 0.0; // Assuming vehicle starts at the leftmost edge of the lane
@@ -83,7 +84,6 @@ std::vector<Node*> RRTLaneChange(int numLanes, double laneWidth, int maxIteratio
             }
         }
     }
-
     // Return the tree after reaching the maximum number of iterations
     return tree;
 }
