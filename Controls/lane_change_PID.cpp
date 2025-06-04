@@ -1,6 +1,8 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+// #include "matplotlibcpp.h"
+// namespace plt = matplotlibcpp;
 
 // Vehicle parameters
 const double L = 2.5; // Wheelbase (meters)
@@ -15,7 +17,7 @@ const double Kd_longitudinal = 0.2; // Derivative gain for longitudinal control
 class PathFollowingController {
 public:
     // Constructor
-    PathFollowingController(std::vector<double>& trajectory) : trajectory_(trajectory), targetIndex_(0) {}
+    PathFollowingController(std::vector<std::vector<double>>& trajectory) : trajectory_(trajectory), targetIndex_(0) {}
 
     // Control function to compute steering angle and throttle
     std::pair<double, double> control(double currentX, double currentY, double currentHeading, double currentVelocity) {
@@ -35,7 +37,7 @@ public:
     }
 
 private:
-    std::vector<double>& trajectory_; // Predefined trajectory
+    std::vector<std::vector<double>>& trajectory_; // Predefined trajectory
     size_t targetIndex_; // Index of the target point on the trajectory
 
     // Update the target index based on current vehicle position
@@ -45,8 +47,8 @@ private:
 
         // Find the nearest point on the trajectory to the current position
         for (size_t i = targetIndex_; i < trajectory_.size(); ++i) {
-            double dx = trajectory_[i] - currentX;
-            double dy = trajectory_[i + 1] - currentY;
+            double dx = trajectory_[i][0] - currentX;
+            double dy = trajectory_[i][1] - currentY;
             double distance = std::sqrt(dx * dx + dy * dy);
 
             if (distance < minDistance) {
@@ -60,8 +62,8 @@ private:
 
     // Calculate cross-track error (lateral error)
     double calculateCrossTrackError(double currentX, double currentY, double currentHeading) {
-        double dx = trajectory_[targetIndex_] - currentX;
-        double dy = trajectory_[targetIndex_ + 1] - currentY;
+        double dx = trajectory_[targetIndex_][0] - currentX;
+        double dy = trajectory_[targetIndex_][1] - currentY;
 
         // Project the position onto the trajectory
         double projection = dx * std::cos(currentHeading) + dy * std::sin(currentHeading);
@@ -111,7 +113,7 @@ private:
 
 int main() {
     // Define the predefined trajectory (for simplicity, assume a straight trajectory)
-    std::vector<double> trajectory = {0.0, 0.0, 10.0, 10.0};
+    std::vector<std::vector<double>> trajectory = {{0.0, 0.0}, {10.0, 10.0}, {20.0, 20.0}, {30.0, 30.0}, {40.0, 40.0}};
 
     // Create the path following controller
     PathFollowingController controller(trajectory);
@@ -123,7 +125,7 @@ int main() {
     double currentVelocity = 5.0; // Initial velocity (m/s)
 
     // Simulate for a certain number of time steps
-    for (int i = 0; i < 100; ++i) {
+    for (int i = 0; i < 10; ++i) {
         // Compute control inputs (steering angle and throttle)
         auto controlInputs = controller.control(currentX, currentY, currentHeading, currentVelocity);
         double steeringAngle = controlInputs.first;
@@ -138,6 +140,30 @@ int main() {
         // Print vehicle state
         std::cout << "Step " << i << ": X = " << currentX << ", Y = " << currentY << ", Heading = " << currentHeading
                   << ", Velocity = " << currentVelocity << std::endl;
+
+        // // Plot the trajectory and current position on a 2D map using matplotlib-cpp
+        // static std::vector<double> xs, ys, traj_x, traj_y;
+        // if (i == 0) {
+        //     // Extract trajectory points only once
+        //     for (const auto& point : trajectory) {
+        //     traj_x.push_back(point[0]);
+        //     traj_y.push_back(point[1]);
+        //     }
+        // }
+        // xs.push_back(currentX);
+        // ys.push_back(currentY);
+
+        // plt::clf();
+        // plt::plot(traj_x, traj_y, "k--", {{"label", "Trajectory"}});
+        // plt::plot(xs, ys, "b-", {{"label", "Vehicle Path"}});
+        // plt::plot({currentX}, {currentY}, "ro", {{"label", "Current Position"}});
+        // plt::legend();
+        // plt::xlabel("X");
+        // plt::ylabel("Y");
+        // plt::title("Vehicle Trajectory Tracking");
+        // plt::pause(0.1);
+
+
     }
 
     return 0;
